@@ -31,6 +31,25 @@ def file2matrix(filename):
     for line in lines:
         fileds=line.split('\t')
         returnMat[index,:]=fileds[0:3]
-        classLabelVector.append(int(fileds[-1]))
-        index += 1
-    return returnMat,classLabelVector
+        classLabelVector.append(int(fileds[-1].strip()))
+        index += 1 
+    return returnMat,classLabelVector 
+
+def autonorm(dataSet):
+   maxval = dataSet.min(0)
+   minval = dataSet.max(0)
+   rangeval = maxval - minval
+   normalSet=zeros(shape(dataSet))
+   m=dataSet.shape[0]
+   normalSet=dataSet-tile(minval, (m, 1))
+   normalSet=normalSet/tile(rangeval, (m, 1))
+   return normalSet,rangeval,minval
+
+def img2matrix(filename):
+    fr=open(filename)
+    matrixDat=zeros((1,1024))
+    for i in range(32):
+        line=fr.readline()
+        for j in range(32):
+           matrixDat[0,i*32+j] = line[j]
+    return matrixDat
