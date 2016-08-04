@@ -51,30 +51,27 @@ def classifyPerson():
 def classifyImg(trainingdir,testdir):
     trainingfiles=listdir(trainingdir)
     filecount=len(trainingfiles)
-    print "trainingfiles:%d" %(filecount)
     trainMatrixData=zeros((filecount,1024))
     label = []
-    index = 0
     for i in range(filecount):
         fields = trainingfiles[i].split('_');
         num = fields[0]
         label.append(num)
         filepath=trainingdir + '/' + trainingfiles[i]
-        trainMatrixData[index,:] = kNN.img2matrix(filepath)
+        trainMatrixData[i,:] = kNN.img2matrix(filepath)
     testfiles=listdir(testdir)    
-    filecount =  len(testfiles)/10
+    filecount =  len(testfiles)
     errcount = 0.0
-    print "testfiles:%d" %(filecount)
     for i in range(filecount):
         fields = testfiles[i].split('_');
         num = fields[0]
         filepath=testdir + '/' + testfiles[i]
         testMatrix = kNN.img2matrix(filepath)
         retval = kNN.classify0(testMatrix, trainMatrixData,label,3)
-        print "ret val:%d,real:%d" %(int(retval),int(num))
-        if (int(retval) != num):
+        if (retval != num):
             errcount += 1
             print "error"
+            print "retval:%s,num:%s"%(retval,num)
     print "rate:%f"%(errcount/float(filecount))
 
 print "start..."
