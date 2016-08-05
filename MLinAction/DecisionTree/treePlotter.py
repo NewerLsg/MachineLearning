@@ -78,7 +78,19 @@ def createPlot(inTree):
     axprops=dict(xtrix=[],yticks=[])
     createPlot.ax1=plt.subplot(111,frameon=False)
     plotTree.totalW=float(getLeafNum(inTree))
-    plotTree.totalD=float(getTreeDept(inTree))
+    plotTree.totalD=float(getTreeDept(inTree))+1
     plotTree.xOff= -0.5/plotTree.totalW;plotTree.yOff=1
     plotTree(inTree,(0.5,1.0),'')
     plt.show()
+
+def classify(inTree, label, testVec):
+    firstStr=inTree.keys()[0] 
+    vecIndex=label.index(firstStr)
+    secondKey=inTree[firstStr]
+    for key in secondKey.keys():
+        if testVec[vecIndex] == key:
+            if type(secondKey[key]).__name__ == 'dict':
+                classlabel = classify(secondKey[key], label, testVec)
+            else:
+                classlabel = secondKey[key]
+    return classlabel
