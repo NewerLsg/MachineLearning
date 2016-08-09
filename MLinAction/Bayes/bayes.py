@@ -99,7 +99,52 @@ def verifyNB():
     
     print errCount
 
+def calcMostFreq(vobalList, fullTxt):
+    import operator
+    freqDic={}
+    for item in vobalList: 
+        freqList[item] = fullTxt.count(item)
+    sortedFreq=sorted(freqDic.iteritems(),key=operator.itemgetter(1),reverse=True)
+    return sorted[:30]
+
+def loadWord(feed1,feed0):
+    import feedpraser
+    docList=[];label=[];fullTxt=[]
+    minLen=min(len(feed1),len(feed0))
+    for i in range(minLen):
+        wordlist=textPrase(feed1['entries'][i]['summary'])
+        doclist.append(word)
+        fullTxt.extend(word)
+        label.append(1)
+        wordlist=textPrase(feed0['entries'][i]['summary'])
+        doclist.append(wordlist)
+        fullTxt.extend(word)
+        label.append(0)
+    vocablist=createVocabList(doclist)
+    top30Words=calcMostFreq(vocablist,fullTxt) 
+    for word in top30Words:
+        if word[0] in vocablist:
+            vobalList.remove(word[0])
+
+    trainSet = range(2 * minLen);testSet=[]
+    for i in range(20):
+        randindex=int(random.uniform(0,len(trainSet)))
+        testSet.append(trainSet[randindex])
+        del(trainSet[randindex])
+
+    trainMat=[];trainClasses = []
+    for index in trainSet:
+        trainMat.append(word2set(doclist[index],vocablist)) 
+        trainClasses.append(label[index])
+    
+    pv0,pv1,pc1=trainNB0(array(trainMat),array(trainClasses))
+    errCount = 0
+    for index in testSet:
+        word = word2set(doclist[index],vablist) 
+        if classifyNB(array(word),pv0,pv1,pc1) != label[index]:
+            errCount += 1
+    print errCount
+
 print 'testing'
 verifyNB()
 print 'ended.'
-
