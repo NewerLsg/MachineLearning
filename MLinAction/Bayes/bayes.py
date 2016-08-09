@@ -43,7 +43,7 @@ def trainNB0(doclist,vocabList,classVec):
     pvocab1 = log(pvocab1/pc1)
     return pvocab0,pvocab1,pVec1
 
-def classifyNB(vec2classify,p0Vec, p1Vec, pc1):
+def classifyNB(vec2classify, p0Vec, p1Vec, pc1):
     p0= sum(vec2classify * p0Vec) + log(pc1)
     p1= sum(vec2classify * p1Vec) + log(1 - pc1)
     if p0 > p1:
@@ -67,7 +67,39 @@ def textPrase(bigString):
     words=re.split(r'\W*',bigString)
     return [tok.lower() for tok in words if len(tok) > 2]
 
+def verifyNB():
+    doclist=[];label=[]
+    for i in range(1,26):
+        wordlist=textPrase(open('./email/spam/%d.txt'%i).read())
+        doclist.append(wordlist)
+        label.append(1)
+        wordlist=textPrase(open('./email/ham/%d.txt'%i).read())
+        doclist.append(wordlist)
+        label.append(0)
+    vocabList=createVocabList(doclist)
+    trainSet=range(50);testSet=[]
+    for i in range(10):
+        randindex = int(random.uniform(0,len(trainSet)))
+        testSet.append(trainSet[randindex]) 
+        del(trainSet[randindex])
+    trainDocList=[];testDocList=[]
+    trainLabel=[]
+    for i in trainSet:
+        trainDocList.append(doclist[i])
+        trainLabel.append(label[i])
+    p0list,p1list,pc1=trainNB0(array(trainDocList),vocabList,array(trainLabel))
+    errCount = 0.0
+    for i in testSet:
+        vablist=array(word2set(doclist[i], vocabList))
+        ret = classifyNB(vablist,p0list,p1list,pc1)
+        print ret
+        if ret != label[i]:
+            print 'err:ret %d label[%d] %d\n'%(ret,i,label[i]),
+            errCount += 1 
+    
+    print errCount
+
 print 'testing'
-testClassifyNB()
+verifyNB()
 print 'ended.'
 
