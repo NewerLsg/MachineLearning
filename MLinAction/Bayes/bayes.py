@@ -103,28 +103,29 @@ def calcMostFreq(vobalList, fullTxt):
     import operator
     freqDic={}
     for item in vobalList: 
-        freqList[item] = fullTxt.count(item)
+        freqDic[item] = fullTxt.count(item)
     sortedFreq=sorted(freqDic.iteritems(),key=operator.itemgetter(1),reverse=True)
-    return sorted[:30]
+    return sortedFreq[:30]
 
 def loadWord(feed1,feed0):
-    import feedpraser
-    docList=[];label=[];fullTxt=[]
-    minLen=min(len(feed1),len(feed0))
+    import feedparser
+    doclist=[];label=[];fullTxt=[]
+    minLen=min(len(feed1['entries']), len(feed0['entries']))
     for i in range(minLen):
-        wordlist=textPrase(feed1['entries'][i]['summary'])
+        word=textPrase(feed1['entries'][i]['summary'])
         doclist.append(word)
         fullTxt.extend(word)
         label.append(1)
-        wordlist=textPrase(feed0['entries'][i]['summary'])
-        doclist.append(wordlist)
+        word=textPrase(feed0['entries'][i]['summary'])
+        doclist.append(word)
         fullTxt.extend(word)
         label.append(0)
     vocablist=createVocabList(doclist)
     top30Words=calcMostFreq(vocablist,fullTxt) 
+    
     for word in top30Words:
         if word[0] in vocablist:
-            vobalList.remove(word[0])
+            vocablist.remove(word[0])
 
     trainSet = range(2 * minLen);testSet=[]
     for i in range(20):
@@ -134,17 +135,20 @@ def loadWord(feed1,feed0):
 
     trainMat=[];trainClasses = []
     for index in trainSet:
-        trainMat.append(word2set(doclist[index],vocablist)) 
+        trainMat.append(doclist[index]) 
+        print 'trainMat:%s'%trainMat
         trainClasses.append(label[index])
-    
-    pv0,pv1,pc1=trainNB0(array(trainMat),array(trainClasses))
+        print 'trainClasses:%s'%trainClasses
+
+    #print trainMat
+    pv0,pv1,pc1=trainNB0(array(trainMat),vocablist,array(trainClasses))
     errCount = 0
     for index in testSet:
-        word = word2set(doclist[index],vablist) 
+        word = word2set(doclist[index],vocablist) 
         if classifyNB(array(word),pv0,pv1,pc1) != label[index]:
             errCount += 1
-    print errCount
+    return vocablist,pv0,pv1,pc1,errCount
 
-print 'testing'
-verifyNB()
-print 'ended.'
+#print 'testing'
+#verifyNB()
+#print 'ended.'
